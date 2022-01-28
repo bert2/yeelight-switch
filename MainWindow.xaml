@@ -10,7 +10,7 @@
   Title="yeelight switch"
   Width="800"
   Height="450"
-  d:DataContext="{d:DesignInstance Type=l:MainWindow,
+  d:DataContext="{d:DesignInstance Type=l:ViewModel,
                                    IsDesignTimeCreatable=True}"
   Background="{DynamicResource MaterialDesignPaper}"
   FontFamily="{md:MaterialDesignFont}"
@@ -18,8 +18,47 @@
   TextElement.FontWeight="Medium"
   TextElement.Foreground="{DynamicResource MaterialDesignBody}"
   mc:Ignorable="d">
-  <Slider
-    Maximum="50"
-    Minimum="0"
-    Value="35" />
+  <Window.Resources>
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+  </Window.Resources>
+  <Grid Margin="16">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*" />
+      <RowDefinition Height="10*" />
+    </Grid.RowDefinitions>
+
+    <Label
+      Grid.Row="0"
+      Content="Loading..."
+      Visibility="{Binding Init.IsNotCompleted, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+    <Label
+      Grid.Row="0"
+      Content="{Binding Init.ErrorMessage}"
+      Visibility="{Binding Init.IsFaulted, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+    <Slider
+      Name="BrigthnessSlider"
+      Grid.Row="0"
+      Maximum="100"
+      Minimum="0"
+      Thumb.DragCompleted="BrigthnessSlider_DragCompleted"
+      Thumb.DragStarted="BrigthnessSlider_DragStarted"
+      ValueChanged="BrigthnessSlider_ValueChanged"
+      Visibility="{Binding Init.IsSuccessfullyCompleted, Converter={StaticResource BooleanToVisibilityConverter}}"
+      Value="{Binding Brightness}" />
+
+    <TextBox
+      Name="Log"
+      Grid.Row="1"
+      VerticalContentAlignment="Stretch"
+      Foreground="DarkGray"
+      HorizontalScrollBarVisibility="Auto"
+      IsReadOnly="True"
+      Style="{StaticResource MaterialDesignOutlinedTextBox}"
+      Text="{Binding Log, Mode=OneWay}"
+      TextChanged="Log_TextChanged"
+      TextWrapping="NoWrap"
+      VerticalScrollBarVisibility="Visible" />
+  </Grid>
 </mde:MaterialWindow>
