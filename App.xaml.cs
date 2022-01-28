@@ -1,8 +1,7 @@
-﻿namespace Yeelight.Switch
-{
-    using System.Windows;
+﻿namespace Yeelight.Switch;
 
-    public partial class App : Application
-    {
-    }
+using System.Windows;
+
+public partial class App : Application
+{
 }

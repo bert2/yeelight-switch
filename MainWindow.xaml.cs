@@ -1,9 +1,8 @@
-﻿namespace Yeelight.Switch
-{
-    using MaterialDesignExtensions.Controls;
+﻿namespace Yeelight.Switch;
 
-    public partial class MainWindow : MaterialWindow
-    {
-        public MainWindow() => InitializeComponent();
-    }
+using MaterialDesignExtensions.Controls;
+
+public partial class MainWindow : MaterialWindow
+{
+    public MainWindow() => InitializeComponent();
 }
