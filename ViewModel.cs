@@ -2,6 +2,7 @@
 
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Media;
 
 using Nito.Mvvm;
 
@@ -10,14 +11,9 @@ using YeelightAPI.Models;
 
 public class ViewModel : INotifyPropertyChanged
 {
-    private Device? device;
-
-    private bool settingBrightness;
-
-    private int brightness;
-    public int Brightness { get => brightness; set => SetProp(ref brightness, value); }
-
     #region Initialization
+
+    private Device? device;
 
     public NotifyTask Init { get; set; }
 
@@ -25,32 +21,75 @@ public class ViewModel : INotifyPropertyChanged
 
     public async Task InitDevice()
     {
-        LogInfo($"searching for device...");
-        DeviceLocator.MaxRetryCount = 3;
-        var devices = await DeviceLocator.DiscoverAsync();
+        try
+        {
+            DeviceLocator.MaxRetryCount = 3;
+            var devices = await LogTask(DeviceLocator.DiscoverAsync(), $"searching for devices");
 
-        device = devices.FirstOrDefault() ?? throw new InvalidOperationException("No device found.");
+            device = devices.FirstOrDefault() ?? throw new InvalidOperationException("No device found.");
 
-        //device.OnNotificationReceived += LogDeviceNotification;
-        device.OnError += LogDeviceError;
+            //device.OnNotificationReceived += LogDeviceNotification;
+            device.OnError += LogDeviceError;
 
-        await LogTask(device.Connect(), $"connecting to {device}");
+            _ = await LogTask(device.Connect(), $"connecting to {device}");
 
-        var brightness = await LogTask(device.GetProp(PROPERTIES.bright), $"reading brightness");
-        Brightness = int.Parse((string)brightness);
+            var brightness = await LogTask(device.GetProp(PROPERTIES.bright), $"reading brightness");
+            Brightness = int.Parse((string)brightness);
+        }
+        catch (Exception ex)
+        {
+            LogNewline();
+            LogError($"failed to initialize: {ex.Message}");
+        }
     }
 
     #endregion Initialization
 
-    public Task SetBrightness(double brightness) => SetBrightness((int)Math.Round(brightness));
+    #region Brightness
+
+    private bool settingBrightness;
+
+    public bool DraggingBrightnessSlider { get; set; }
+
+    private int brightness;
+    public int Brightness
+    {
+        get => brightness;
+        set
+        {
+            _ = SetProp(ref brightness, value);
+            _ = SetBrightness(value);
+        }
+    }
+
+    public DoubleCollection BrightnessTicks { get; } = new DoubleCollection(Enumerable
+        .Range(1, 100)
+        .Select(x => x.ToDouble().Normalize(1, 100).SquareRoot().Denormalize(1, 100)));
+
+    public Task SetBrightness() => SetBrightness(Brightness);
 
     public async Task SetBrightness(int brightness)
     {
-        if (settingBrightness) return;
-        settingBrightness = true;
-        await LogTask(device!.SetBrightness(brightness), $"setting brightness to {brightness}");
-        settingBrightness = false;
+        if (settingBrightness || DraggingBrightnessSlider || device is null || Init.IsNotCompleted)
+            return;
+
+        try
+        {
+            settingBrightness = true;
+            _ = await LogTask(device.SetBrightness(brightness), $"setting brightness to {brightness}");
+        }
+        catch (Exception ex)
+        {
+            LogNewline();
+            LogError($"failed to set brightness: {ex.Message}");
+        }
+        finally
+        {
+            settingBrightness = false;
+        }
     }
+
+    #endregion Brightness
 
     #region Log
 
@@ -61,18 +100,11 @@ public class ViewModel : INotifyPropertyChanged
 
     public void LogError(FormattableString msg) => Log += $"ERROR: {msg}\n";
 
-    public async Task LogTask(Task<bool> task, FormattableString msg)
-    {
-        Log += $"{msg} ... ";
-        Log += await task ? "done" : "FAILED";
-        Log += '\n';
-    }
-
-    public async Task<object> LogTask(Task<object> task, FormattableString msg)
+    public async Task<T> LogTask<T>(Task<T> task, FormattableString msg)
     {
         Log += $"{msg} ... ";
         var result = await task;
-        Log += result;
+        Log += PrintResult(result);
         Log += '\n';
         return result;
     }
@@ -80,6 +112,15 @@ public class ViewModel : INotifyPropertyChanged
     public void LogDeviceNotification(object _, NotificationReceivedEventArgs e) => LogInfo($"notification received: {e.Result}");
 
     public void LogDeviceError(object _, UnhandledExceptionEventArgs e) => LogError($"{e.ExceptionObject}");
+
+    public void LogNewline() => Log += '\n';
+
+    private static string PrintResult<T>(T x) => x switch
+    {
+        bool b => b ? "done" : "FAILED",
+        IEnumerable<Device> e => e.Count().ToString(),
+        _ => x?.ToString() ?? ""
+    };
 
     #endregion Log
 

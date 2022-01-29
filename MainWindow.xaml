@@ -19,8 +19,13 @@
   TextElement.Foreground="{DynamicResource MaterialDesignBody}"
   mc:Ignorable="d">
   <Window.Resources>
-    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    <BooleanToVisibilityConverter x:Key="BoolToVisConv" />
+    <l:QuadScaleConverter
+      x:Key="QuadScaleConv"
+      Max="100"
+      Min="1" />
   </Window.Resources>
+
   <Grid Margin="16">
     <Grid.RowDefinitions>
       <RowDefinition Height="*" />
@@ -30,23 +35,25 @@
     <Label
       Grid.Row="0"
       Content="Loading..."
-      Visibility="{Binding Init.IsNotCompleted, Converter={StaticResource BooleanToVisibilityConverter}}" />
+      Visibility="{Binding Init.IsNotCompleted, Converter={StaticResource BoolToVisConv}}" />
 
     <Label
       Grid.Row="0"
       Content="{Binding Init.ErrorMessage}"
-      Visibility="{Binding Init.IsFaulted, Converter={StaticResource BooleanToVisibilityConverter}}" />
+      Visibility="{Binding Init.IsFaulted, Converter={StaticResource BoolToVisConv}}" />
 
     <Slider
       Name="BrigthnessSlider"
       Grid.Row="0"
+      IsSnapToTickEnabled="True"
       Maximum="100"
-      Minimum="0"
+      Minimum="1"
       Thumb.DragCompleted="BrigthnessSlider_DragCompleted"
       Thumb.DragStarted="BrigthnessSlider_DragStarted"
-      ValueChanged="BrigthnessSlider_ValueChanged"
-      Visibility="{Binding Init.IsSuccessfullyCompleted, Converter={StaticResource BooleanToVisibilityConverter}}"
-      Value="{Binding Brightness}" />
+      TickPlacement="TopLeft"
+      Ticks="{Binding BrightnessTicks, Mode=OneTime}"
+      Visibility="{Binding Init.IsSuccessfullyCompleted, Converter={StaticResource BoolToVisConv}}"
+      Value="{Binding Brightness, Converter={StaticResource QuadScaleConv}}" />
 
     <TextBox
       Name="Log"
