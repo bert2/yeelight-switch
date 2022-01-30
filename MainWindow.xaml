@@ -40,19 +40,22 @@
     <Expander
       Padding="16"
       HorizontalAlignment="Stretch"
-      Header="brightness"
+      Header="💡   brightness"
       IsExpanded="True">
       <Grid>
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
         <ToggleButton
           Grid.Column="0"
           Width="48"
           Height="48"
-          Margin="0,0,16,0"
+          Margin="0,0,32,0"
+          VerticalAlignment="Center"
           md:ToggleButtonAssist.OnContent="{md:PackIcon Kind=LightbulbOn}"
           Content="{md:PackIcon Kind=LightbulbOffOutline}"
           IsChecked="{Binding Power}"
@@ -60,8 +63,17 @@
           Style="{StaticResource MaterialDesignActionToggleButton}"
           ToolTip="{Binding PowerButtonTooltip}" />
 
-        <Slider
+        <md:PackIcon
           Grid.Column="1"
+          Width="32"
+          Height="32"
+          Margin="0,0,16,0"
+          VerticalAlignment="Center"
+          Kind="Brightness3" />
+
+        <Slider
+          Grid.Column="2"
+          Margin="0,0,16,0"
           VerticalAlignment="Center"
           IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
           IsSnapToTickEnabled="True"
@@ -71,6 +83,14 @@
           Ticks="{Binding BrightnessTicks, Mode=OneTime}"
           ToolTip="adjust brightness"
           Value="{Binding Brightness, Converter={StaticResource QuadScaleConv}}" />
+
+        <md:PackIcon
+          Grid.Column="3"
+          Width="32"
+          Height="32"
+          Margin="0,0,16,0"
+          VerticalAlignment="Center"
+          Kind="Brightness1" />
       </Grid>
     </Expander>
 
@@ -79,14 +99,42 @@
     <Expander
       Padding="16"
       HorizontalAlignment="Stretch"
-      Header="color temperature"
+      Header="🌡   color temperature"
       IsExpanded="True">
-      <Slider
-        IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
-        Maximum="{Binding Source={x:Static l:ViewModel.MaxColorTemperature}, Mode=OneTime}"
-        Minimum="{Binding Source={x:Static l:ViewModel.MinColorTemperature}, Mode=OneTime}"
-        ToolTip="adjust color temperature"
-        Value="{Binding ColorTemperature}" />
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <md:PackIcon
+          Grid.Column="0"
+          Width="32"
+          Height="32"
+          Margin="0,0,16,0"
+          VerticalAlignment="Center"
+          Kind="WhiteBalanceSunny" />
+
+        <Slider
+          Grid.Column="1"
+          Margin="0,0,16,0"
+          VerticalAlignment="Center"
+          IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
+          Maximum="{Binding Source={x:Static l:ViewModel.MaxColorTemperature}, Mode=OneTime}"
+          Minimum="{Binding Source={x:Static l:ViewModel.MinColorTemperature}, Mode=OneTime}"
+          TickFrequency="100"
+          TickPlacement="Both"
+          ToolTip="adjust color temperature"
+          Value="{Binding ColorTemperature}" />
+
+        <md:PackIcon
+          Grid.Column="2"
+          Width="32"
+          Height="32"
+          VerticalAlignment="Center"
+          Kind="Snowflake" />
+      </Grid>
     </Expander>
 
     <Border Style="{StaticResource HorizontalDividerBorder}" />
@@ -94,7 +142,7 @@
     <Expander
       Padding="16"
       HorizontalAlignment="Stretch"
-      Header="log">
+      Header="📃   log">
       <TextBox
         Name="Log"
         Grid.Row="2"
