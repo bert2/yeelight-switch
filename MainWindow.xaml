@@ -9,11 +9,12 @@
   xmlns:mde="https://spiegelp.github.io/MaterialDesignExtensions/winfx/xaml"
   Title="yeelight switch"
   Width="800"
-  Height="450"
+  Height="Auto"
   d:DataContext="{d:DesignInstance Type=l:ViewModel,
                                    IsDesignTimeCreatable=True}"
   Background="{DynamicResource MaterialDesignPaper}"
   FontFamily="{md:MaterialDesignFont}"
+  SizeToContent="Height"
   TextElement.FontSize="14"
   TextElement.FontWeight="Medium"
   TextElement.Foreground="{DynamicResource MaterialDesignBody}"
@@ -23,33 +24,63 @@
       x:Key="QuadScaleConv"
       Max="{x:Static l:ViewModel.MaxBrightness}"
       Min="{x:Static l:ViewModel.MinBrightness}" />
+
+    <Style
+      x:Key="HorizontalDividerBorder"
+      TargetType="{x:Type Border}">
+      <Setter Property="Background" Value="{DynamicResource MaterialDesignDivider}" />
+      <Setter Property="UseLayoutRounding" Value="True" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="Height" Value="1" />
+    </Style>
   </Window.Resources>
 
-  <Grid Margin="16">
-    <Grid.RowDefinitions>
-      <RowDefinition Height="*" />
-      <RowDefinition Height="*" />
-      <RowDefinition Height="*" />
-    </Grid.RowDefinitions>
+  <StackPanel>
+    <Expander
+      Padding="16"
+      HorizontalAlignment="Stretch"
+      Header="brightness"
+      IsExpanded="True">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-    <GroupBox
-      Grid.Row="0"
-      Header="brightness">
-      <Slider
-        Name="BrigthnessSlider"
-        IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
-        IsSnapToTickEnabled="True"
-        Maximum="{Binding Source={x:Static l:ViewModel.MaxBrightness}, Mode=OneTime}"
-        Minimum="{Binding Source={x:Static l:ViewModel.MinBrightness}, Mode=OneTime}"
-        Thumb.DragCompleted="BrigthnessSlider_DragCompleted"
-        Thumb.DragStarted="BrigthnessSlider_DragStarted"
-        TickPlacement="Both"
-        Ticks="{Binding BrightnessTicks, Mode=OneTime}"
-        Value="{Binding Brightness, Converter={StaticResource QuadScaleConv}}" />
-    </GroupBox>
+        <ToggleButton
+          Grid.Column="0"
+          Width="48"
+          Height="48"
+          Margin="0,0,16,0"
+          md:ToggleButtonAssist.OnContent="{md:PackIcon Kind=LightbulbOn}"
+          Content="{md:PackIcon Kind=LightbulbOffOutline}"
+          IsChecked="{Binding Power}"
+          IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
+          Style="{StaticResource MaterialDesignActionToggleButton}"
+          ToolTip="toggle on/off" />
 
-    <GroupBox
-      Grid.Row="1"
+        <Slider
+          Name="BrigthnessSlider"
+          Grid.Column="1"
+          VerticalAlignment="Center"
+          IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
+          IsSnapToTickEnabled="True"
+          Maximum="{Binding Source={x:Static l:ViewModel.MaxBrightness}, Mode=OneTime}"
+          Minimum="{Binding Source={x:Static l:ViewModel.MinBrightness}, Mode=OneTime}"
+          Thumb.DragCompleted="BrigthnessSlider_DragCompleted"
+          Thumb.DragStarted="BrigthnessSlider_DragStarted"
+          TickPlacement="Both"
+          Ticks="{Binding BrightnessTicks, Mode=OneTime}"
+          ToolTip="adjust brightness"
+          Value="{Binding Brightness, Converter={StaticResource QuadScaleConv}}" />
+      </Grid>
+    </Expander>
+
+    <Border Style="{StaticResource HorizontalDividerBorder}" />
+
+    <Expander
+      Padding="16"
+      HorizontalAlignment="Stretch"
       Header="color">
       <Slider
         Name="ColorSlider"
@@ -62,14 +93,19 @@
         TickPlacement="Both"
         Ticks="{Binding BrightnessTicks, Mode=OneTime}"
         Value="{Binding Brightness, Converter={StaticResource QuadScaleConv}}" />
-    </GroupBox>
+    </Expander>
 
-    <GroupBox
-      Grid.Row="2"
-      Header="log">
+    <Border Style="{StaticResource HorizontalDividerBorder}" />
+
+    <Expander
+      Padding="16"
+      HorizontalAlignment="Stretch"
+      Header="log"
+      IsExpanded="True">
       <TextBox
         Name="Log"
         Grid.Row="2"
+        MaxHeight="300"
         VerticalContentAlignment="Stretch"
         BorderThickness="0"
         Foreground="DarkGray"
@@ -79,6 +115,6 @@
         TextChanged="Log_TextChanged"
         TextWrapping="NoWrap"
         VerticalScrollBarVisibility="Visible" />
-    </GroupBox>
-  </Grid>
+    </Expander>
+  </StackPanel>
 </mde:MaterialWindow>

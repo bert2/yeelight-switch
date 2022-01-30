@@ -33,6 +33,9 @@ public class ViewModel : INotifyPropertyChanged
 
             _ = await LogTask(device.Connect(), $"connecting to {device}");
 
+            var toggle = await LogTask(device.GetProp(PROPERTIES.power), $"reading power");
+            Power = toggle.Equals("on");
+
             var brightness = await LogTask(device.GetProp(PROPERTIES.bright), $"reading brightness");
             Brightness = int.Parse((string)brightness);
         }
@@ -44,6 +47,46 @@ public class ViewModel : INotifyPropertyChanged
     }
 
     #endregion Initialization
+
+    #region Power
+
+    private bool settingPower;
+
+    private bool power;
+    public bool Power
+    {
+        get => power;
+        set
+        {
+            _ = SetProp(ref power, value);
+            _ = SetPower(value);
+        }
+    }
+
+    public async Task SetPower(bool power)
+    {
+        if (device is null || Init.IsNotCompleted || settingPower)
+            return;
+
+        try
+        {
+            settingPower = true;
+            _ = await LogTask(
+                power ? device.TurnOn() : device.TurnOff(),
+                $"turning device {(power ? "on" : "off")}");
+        }
+        catch (Exception ex)
+        {
+            LogNewline();
+            LogError($"failed to toggle power: {ex.Message}");
+        }
+        finally
+        {
+            settingPower = false;
+        }
+    }
+
+    #endregion Power
 
     #region Brightness
 
@@ -74,7 +117,7 @@ public class ViewModel : INotifyPropertyChanged
 
     public async Task SetBrightness(int brightness)
     {
-        if (settingBrightness || DraggingBrightnessSlider || device is null || Init.IsNotCompleted)
+        if (device is null || Init.IsNotCompleted || settingBrightness || DraggingBrightnessSlider)
             return;
 
         try
