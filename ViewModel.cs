@@ -13,7 +13,7 @@ public class ViewModel : INotifyPropertyChanged
 {
     #region Initialization
 
-    private Device? device;
+    private Device? yeelight;
 
     public NotifyTask Init { get; set; }
 
@@ -26,31 +26,57 @@ public class ViewModel : INotifyPropertyChanged
             DeviceLocator.MaxRetryCount = 3;
             var devices = await LogTask(DeviceLocator.DiscoverAsync(), $"searching for devices");
 
-            device = devices.FirstOrDefault() ?? throw new InvalidOperationException("No device found.");
+            yeelight = devices.FirstOrDefault() ?? throw new InvalidOperationException("No device found.");
 
             //device.OnNotificationReceived += LogDeviceNotification;
-            device.OnError += LogDeviceError;
+            yeelight.OnError += LogDeviceError;
 
-            _ = await LogTask(device.Connect(), $"connecting to {device}");
+            _ = await LogTask(yeelight.Connect(), $"connecting to {yeelight}");
 
-            var toggle = await LogTask(device.GetProp(PROPERTIES.power), $"reading power");
+            var toggle = await LogTask(yeelight.GetProp(PROPERTIES.power), $"reading power");
             Power = toggle.Equals("on");
 
-            var brightness = await LogTask(device.GetProp(PROPERTIES.bright), $"reading brightness");
+            var brightness = await LogTask(yeelight.GetProp(PROPERTIES.bright), $"reading brightness");
             Brightness = int.Parse((string)brightness);
         }
         catch (Exception ex)
         {
             LogNewline();
             LogError($"failed to initialize: {ex.Message}");
+            throw;
         }
     }
 
     #endregion Initialization
 
-    #region Power
+    #region Command execution
 
-    private bool settingPower;
+    private bool commandExecuting;
+
+    public async Task Exec(Func<Device, Task<bool>> task, FormattableString msg)
+    {
+        if (yeelight is null || !Init.IsSuccessfullyCompleted || commandExecuting)
+            return;
+
+        try
+        {
+            commandExecuting = true;
+            _ = await LogTask(task(yeelight), msg);
+        }
+        catch (Exception ex)
+        {
+            LogNewline();
+            LogError($"failure when {msg}: {ex.Message}");
+        }
+        finally
+        {
+            commandExecuting = false;
+        }
+    }
+
+    #endregion Command execution
+
+    #region Power
 
     private bool power;
     public bool Power
@@ -60,31 +86,15 @@ public class ViewModel : INotifyPropertyChanged
         {
             _ = SetProp(ref power, value);
             _ = SetPower(value);
+            RaisePropertyChanged(nameof(PowerButtonTooltip));
         }
     }
 
-    public async Task SetPower(bool power)
-    {
-        if (device is null || Init.IsNotCompleted || settingPower)
-            return;
+    public string PowerButtonTooltip => $"turn {(Power ? "off" : "on")}";
 
-        try
-        {
-            settingPower = true;
-            _ = await LogTask(
-                power ? device.TurnOn() : device.TurnOff(),
-                $"turning device {(power ? "on" : "off")}");
-        }
-        catch (Exception ex)
-        {
-            LogNewline();
-            LogError($"failed to toggle power: {ex.Message}");
-        }
-        finally
-        {
-            settingPower = false;
-        }
-    }
+    public async Task SetPower(bool power) => await Exec(
+        d => power ? d.TurnOn() : d.TurnOff(),
+        $"turning device {(power ? "on" : "off")}");
 
     #endregion Power
 
@@ -94,11 +104,7 @@ public class ViewModel : INotifyPropertyChanged
 
     public const int MaxBrightness = 100;
 
-    private bool settingBrightness;
-
-    public bool DraggingBrightnessSlider { get; set; }
-
-    private int brightness;
+    private int brightness = MinBrightness;
     public int Brightness
     {
         get => brightness;
@@ -113,28 +119,9 @@ public class ViewModel : INotifyPropertyChanged
         .Range(MinBrightness, MaxBrightness)
         .Select(x => x.ToDouble().SqrtScale(MinBrightness, MaxBrightness)));
 
-    public Task SetBrightness() => SetBrightness(Brightness);
-
-    public async Task SetBrightness(int brightness)
-    {
-        if (device is null || Init.IsNotCompleted || settingBrightness || DraggingBrightnessSlider)
-            return;
-
-        try
-        {
-            settingBrightness = true;
-            _ = await LogTask(device.SetBrightness(brightness), $"setting brightness to {brightness}");
-        }
-        catch (Exception ex)
-        {
-            LogNewline();
-            LogError($"failed to set brightness: {ex.Message}");
-        }
-        finally
-        {
-            settingBrightness = false;
-        }
-    }
+    public async Task SetBrightness(int brightness) => await Exec(
+        d => d.SetBrightness(brightness),
+        $"setting brightness to {brightness}");
 
     #endregion Brightness
 

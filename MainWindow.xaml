@@ -57,7 +57,7 @@
           IsChecked="{Binding Power}"
           IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
           Style="{StaticResource MaterialDesignActionToggleButton}"
-          ToolTip="toggle on/off" />
+          ToolTip="{Binding PowerButtonTooltip}" />
 
         <Slider
           Name="BrigthnessSlider"
@@ -67,8 +67,6 @@
           IsSnapToTickEnabled="True"
           Maximum="{Binding Source={x:Static l:ViewModel.MaxBrightness}, Mode=OneTime}"
           Minimum="{Binding Source={x:Static l:ViewModel.MinBrightness}, Mode=OneTime}"
-          Thumb.DragCompleted="BrigthnessSlider_DragCompleted"
-          Thumb.DragStarted="BrigthnessSlider_DragStarted"
           TickPlacement="Both"
           Ticks="{Binding BrightnessTicks, Mode=OneTime}"
           ToolTip="adjust brightness"
@@ -88,10 +86,9 @@
         IsSnapToTickEnabled="True"
         Maximum="{Binding Source={x:Static l:ViewModel.MaxBrightness}, Mode=OneTime}"
         Minimum="{Binding Source={x:Static l:ViewModel.MinBrightness}, Mode=OneTime}"
-        Thumb.DragCompleted="BrigthnessSlider_DragCompleted"
-        Thumb.DragStarted="BrigthnessSlider_DragStarted"
         TickPlacement="Both"
         Ticks="{Binding BrightnessTicks, Mode=OneTime}"
+        ToolTip="adjust color"
         Value="{Binding Brightness, Converter={StaticResource QuadScaleConv}}" />
     </Expander>
 

@@ -16,15 +16,6 @@ public partial class MainWindow : MaterialWindow
         DataContext = viewModel;
     }
 
-    private void BrigthnessSlider_DragStarted(object _, DragStartedEventArgs __)
-        => viewModel.DraggingBrightnessSlider = true;
-
-    private async void BrigthnessSlider_DragCompleted(object _, DragCompletedEventArgs __)
-    {
-        viewModel.DraggingBrightnessSlider = false;
-        await viewModel.SetBrightness();
-    }
-
     private void Log_TextChanged(object sender, TextChangedEventArgs _)
         => ((TextBoxBase)sender).ScrollToEnd();
 }
