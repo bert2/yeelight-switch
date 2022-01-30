@@ -33,11 +33,14 @@ public class ViewModel : INotifyPropertyChanged
 
             _ = await LogTask(yeelight.Connect(), $"connecting to {yeelight}");
 
-            var toggle = await LogTask(yeelight.GetProp(PROPERTIES.power), $"reading power");
-            Power = toggle.Equals("on");
+            var power = await LogTask(yeelight.GetProp(PROPERTIES.power), $"reading power");
+            Power = power.Equals("on");
 
             var brightness = await LogTask(yeelight.GetProp(PROPERTIES.bright), $"reading brightness");
             Brightness = int.Parse((string)brightness);
+
+            var coltemp = await LogTask(yeelight.GetProp(PROPERTIES.ct), $"reading color temperature");
+            ColorTemperature = int.Parse((string)coltemp);
         }
         catch (Exception ex)
         {
@@ -47,7 +50,7 @@ public class ViewModel : INotifyPropertyChanged
         }
     }
 
-    #endregion Initialization
+    #endregion
 
     #region Command execution
 
@@ -74,7 +77,7 @@ public class ViewModel : INotifyPropertyChanged
         }
     }
 
-    #endregion Command execution
+    #endregion
 
     #region Power
 
@@ -96,7 +99,7 @@ public class ViewModel : INotifyPropertyChanged
         d => power ? d.TurnOn() : d.TurnOff(),
         $"turning device {(power ? "on" : "off")}");
 
-    #endregion Power
+    #endregion
 
     #region Brightness
 
@@ -123,7 +126,30 @@ public class ViewModel : INotifyPropertyChanged
         d => d.SetBrightness(brightness),
         $"setting brightness to {brightness}");
 
-    #endregion Brightness
+    #endregion
+
+    #region Color temperature
+
+    public const int MinColorTemperature = 1700;
+
+    public const int MaxColorTemperature = 6500;
+
+    private int colorTemperature = MinColorTemperature;
+    public int ColorTemperature
+    {
+        get => colorTemperature;
+        set
+        {
+            _ = SetProp(ref colorTemperature, value);
+            _ = SetColorTemperature(value);
+        }
+    }
+
+    public async Task SetColorTemperature(int coltemp) => await Exec(
+        d => d.SetColorTemperature(coltemp),
+        $"setting color temperature to {coltemp}");
+
+    #endregion
 
     #region Log
 
@@ -156,7 +182,7 @@ public class ViewModel : INotifyPropertyChanged
         _ => x?.ToString() ?? ""
     };
 
-    #endregion Log
+    #endregion
 
     #region INotifyPropertyChanged
 
@@ -175,5 +201,5 @@ public class ViewModel : INotifyPropertyChanged
         return true;
     }
 
-    #endregion INotifyPropertyChanged
+    #endregion
 }

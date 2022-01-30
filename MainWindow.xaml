@@ -13,6 +13,7 @@
   d:DataContext="{d:DesignInstance Type=l:ViewModel,
                                    IsDesignTimeCreatable=True}"
   Background="{DynamicResource MaterialDesignPaper}"
+  BorderBackgroundBrush="{DynamicResource MaterialDesignToolBarBackground}"
   FontFamily="{md:MaterialDesignFont}"
   SizeToContent="Height"
   TextElement.FontSize="14"
@@ -60,7 +61,6 @@
           ToolTip="{Binding PowerButtonTooltip}" />
 
         <Slider
-          Name="BrigthnessSlider"
           Grid.Column="1"
           VerticalAlignment="Center"
           IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
@@ -79,17 +79,14 @@
     <Expander
       Padding="16"
       HorizontalAlignment="Stretch"
-      Header="color">
+      Header="color temperature"
+      IsExpanded="True">
       <Slider
-        Name="ColorSlider"
         IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
-        IsSnapToTickEnabled="True"
-        Maximum="{Binding Source={x:Static l:ViewModel.MaxBrightness}, Mode=OneTime}"
-        Minimum="{Binding Source={x:Static l:ViewModel.MinBrightness}, Mode=OneTime}"
-        TickPlacement="Both"
-        Ticks="{Binding BrightnessTicks, Mode=OneTime}"
-        ToolTip="adjust color"
-        Value="{Binding Brightness, Converter={StaticResource QuadScaleConv}}" />
+        Maximum="{Binding Source={x:Static l:ViewModel.MaxColorTemperature}, Mode=OneTime}"
+        Minimum="{Binding Source={x:Static l:ViewModel.MinColorTemperature}, Mode=OneTime}"
+        ToolTip="adjust color temperature"
+        Value="{Binding ColorTemperature}" />
     </Expander>
 
     <Border Style="{StaticResource HorizontalDividerBorder}" />
@@ -97,8 +94,7 @@
     <Expander
       Padding="16"
       HorizontalAlignment="Stretch"
-      Header="log"
-      IsExpanded="True">
+      Header="log">
       <TextBox
         Name="Log"
         Grid.Row="2"
