@@ -19,53 +19,66 @@
   TextElement.Foreground="{DynamicResource MaterialDesignBody}"
   mc:Ignorable="d">
   <Window.Resources>
-    <BooleanToVisibilityConverter x:Key="BoolToVisConv" />
     <l:QuadScaleConverter
       x:Key="QuadScaleConv"
-      Max="100"
-      Min="1" />
+      Max="{x:Static l:ViewModel.MaxBrightness}"
+      Min="{x:Static l:ViewModel.MinBrightness}" />
   </Window.Resources>
 
   <Grid Margin="16">
     <Grid.RowDefinitions>
       <RowDefinition Height="*" />
-      <RowDefinition Height="10*" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <Label
+    <GroupBox
       Grid.Row="0"
-      Content="Loading..."
-      Visibility="{Binding Init.IsNotCompleted, Converter={StaticResource BoolToVisConv}}" />
+      Header="brightness">
+      <Slider
+        Name="BrigthnessSlider"
+        IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
+        IsSnapToTickEnabled="True"
+        Maximum="{Binding Source={x:Static l:ViewModel.MaxBrightness}, Mode=OneTime}"
+        Minimum="{Binding Source={x:Static l:ViewModel.MinBrightness}, Mode=OneTime}"
+        Thumb.DragCompleted="BrigthnessSlider_DragCompleted"
+        Thumb.DragStarted="BrigthnessSlider_DragStarted"
+        TickPlacement="Both"
+        Ticks="{Binding BrightnessTicks, Mode=OneTime}"
+        Value="{Binding Brightness, Converter={StaticResource QuadScaleConv}}" />
+    </GroupBox>
 
-    <Label
-      Grid.Row="0"
-      Content="{Binding Init.ErrorMessage}"
-      Visibility="{Binding Init.IsFaulted, Converter={StaticResource BoolToVisConv}}" />
-
-    <Slider
-      Name="BrigthnessSlider"
-      Grid.Row="0"
-      IsSnapToTickEnabled="True"
-      Maximum="100"
-      Minimum="1"
-      Thumb.DragCompleted="BrigthnessSlider_DragCompleted"
-      Thumb.DragStarted="BrigthnessSlider_DragStarted"
-      TickPlacement="TopLeft"
-      Ticks="{Binding BrightnessTicks, Mode=OneTime}"
-      Visibility="{Binding Init.IsSuccessfullyCompleted, Converter={StaticResource BoolToVisConv}}"
-      Value="{Binding Brightness, Converter={StaticResource QuadScaleConv}}" />
-
-    <TextBox
-      Name="Log"
+    <GroupBox
       Grid.Row="1"
-      VerticalContentAlignment="Stretch"
-      Foreground="DarkGray"
-      HorizontalScrollBarVisibility="Auto"
-      IsReadOnly="True"
-      Style="{StaticResource MaterialDesignOutlinedTextBox}"
-      Text="{Binding Log, Mode=OneWay}"
-      TextChanged="Log_TextChanged"
-      TextWrapping="NoWrap"
-      VerticalScrollBarVisibility="Visible" />
+      Header="color">
+      <Slider
+        Name="ColorSlider"
+        IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
+        IsSnapToTickEnabled="True"
+        Maximum="{Binding Source={x:Static l:ViewModel.MaxBrightness}, Mode=OneTime}"
+        Minimum="{Binding Source={x:Static l:ViewModel.MinBrightness}, Mode=OneTime}"
+        Thumb.DragCompleted="BrigthnessSlider_DragCompleted"
+        Thumb.DragStarted="BrigthnessSlider_DragStarted"
+        TickPlacement="Both"
+        Ticks="{Binding BrightnessTicks, Mode=OneTime}"
+        Value="{Binding Brightness, Converter={StaticResource QuadScaleConv}}" />
+    </GroupBox>
+
+    <GroupBox
+      Grid.Row="2"
+      Header="log">
+      <TextBox
+        Name="Log"
+        Grid.Row="2"
+        VerticalContentAlignment="Stretch"
+        BorderThickness="0"
+        Foreground="DarkGray"
+        HorizontalScrollBarVisibility="Auto"
+        IsReadOnly="True"
+        Text="{Binding Log, Mode=OneWay}"
+        TextChanged="Log_TextChanged"
+        TextWrapping="NoWrap"
+        VerticalScrollBarVisibility="Visible" />
+    </GroupBox>
   </Grid>
 </mde:MaterialWindow>

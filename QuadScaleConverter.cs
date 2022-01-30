@@ -11,24 +11,28 @@ public class QuadScaleConverter : IValueConverter
 
     public double Max { get; set; } = 1;
 
-    public object? Convert(object? value, Type targetType, object parameter, CultureInfo culture) => value
-        .ToDouble()
-        .Clamp(Min, Max)
-        .Normalize(Min, Max)
-        .SquareRoot()
-        .Denormalize(Min, Max);
+    public object? Convert(object? value, Type targetType, object parameter, CultureInfo culture)
+        => value.ToDouble().SqrtScale(Min, Max);
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => value
-        .ToDouble()
-        .Clamp(Min, Max)
-        .Normalize(Min, Max)
-        .Square()
-        .Denormalize(Min, Max);
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => value.ToDouble().SqScale(Min, Max);
 }
 
 public static class Ext
 {
     public static double ToDouble(this object? x) => Convert.ToDouble(x);
+
+    public static double SqScale(this double x, double min, double max) => x
+        .Clamp(min, max)
+        .Normalize(min, max)
+        .Square()
+        .Denormalize(min, max);
+
+    public static double SqrtScale(this double x, double min, double max) => x
+        .Clamp(min, max)
+        .Normalize(min, max)
+        .SquareRoot()
+        .Denormalize(min, max);
 
     public static double Clamp(this double x, double min, double max) => Math.Clamp(x, min, max);
 

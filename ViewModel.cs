@@ -47,6 +47,10 @@ public class ViewModel : INotifyPropertyChanged
 
     #region Brightness
 
+    public const int MinBrightness = 1;
+
+    public const int MaxBrightness = 100;
+
     private bool settingBrightness;
 
     public bool DraggingBrightnessSlider { get; set; }
@@ -63,8 +67,8 @@ public class ViewModel : INotifyPropertyChanged
     }
 
     public DoubleCollection BrightnessTicks { get; } = new DoubleCollection(Enumerable
-        .Range(1, 100)
-        .Select(x => x.ToDouble().Normalize(1, 100).SquareRoot().Denormalize(1, 100)));
+        .Range(MinBrightness, MaxBrightness)
+        .Select(x => x.ToDouble().SqrtScale(MinBrightness, MaxBrightness)));
 
     public Task SetBrightness() => SetBrightness(Brightness);
 
