@@ -1,10 +1,13 @@
 ﻿namespace Yeelight.Switch;
 
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
 
 using Nito.Mvvm;
+
+using Yeelight.Switch.Sync;
 
 using YeelightAPI;
 using YeelightAPI.Models;
@@ -14,6 +17,8 @@ public class ViewModel : INotifyPropertyChanged
     #region Initialization
 
     private Device? yeelight;
+
+    private Syncer? syncer;
 
     public NotifyTask Init { get; set; }
 
@@ -40,7 +45,11 @@ public class ViewModel : INotifyPropertyChanged
             Brightness = int.Parse((string)brightness);
 
             var coltemp = await LogTask(yeelight.GetProp(PROPERTIES.ct), $"reading color temperature");
-            ColorTemperature = int.Parse((string)coltemp);
+            ColorTemp = int.Parse((string)coltemp);
+
+            await LogTask(yeelight.StartMusicMode(), $"starting music mode");
+
+            syncer = new Syncer(yeelight);
         }
         catch (Exception ex)
         {
@@ -130,28 +139,32 @@ public class ViewModel : INotifyPropertyChanged
 
     #region Color temperature
 
-    public const int MinColorTemperature = 1700;
+    public const int MinColorTemp = 1700;
 
-    public const int MaxColorTemperature = 6500;
+    public const int MaxColorTemp = 6500;
 
-    private int colorTemperature = MinColorTemperature;
-    public int ColorTemperature
+    private int colorTemp = MinColorTemp;
+    public int ColorTemp
     {
-        get => colorTemperature;
+        get => colorTemp;
         set
         {
-            _ = SetProp(ref colorTemperature, value);
-            _ = SetColorTemperature(value);
+            _ = SetProp(ref colorTemp, value);
+            _ = SetColorTemp(value);
         }
     }
 
-    public async Task SetColorTemperature(int coltemp) => await Exec(
+    public DoubleCollection ColorTempTicks { get; } = [.. Enumerable
+        .Range(MinColorTemp, MaxColorTemp)
+        .Select(x => x.ToDouble().SqrtScale(MinColorTemp, MaxColorTemp))];
+
+    public async Task SetColorTemp(int coltemp) => await Exec(
         d => d.SetColorTemperature(coltemp),
         $"setting color temperature to {coltemp}");
 
     #endregion
 
-    #region sync
+    #region Sync
 
     private bool syncRunning;
     public bool SyncRunning
@@ -160,14 +173,24 @@ public class ViewModel : INotifyPropertyChanged
         set
         {
             _ = SetProp(ref syncRunning, value);
-            ToggleSync();
+            _ = ToggleSync();
             RaisePropertyChanged(nameof(SyncButtonTooltip));
         }
     }
 
     public string SyncButtonTooltip => $"{(syncRunning ? "stop" : "start")} syncing";
 
-    public void ToggleSync() {}
+    public async Task ToggleSync() => await Exec(async d =>
+    {
+        if (syncer == null) return false;
+
+        if (syncer.Running)
+            await syncer.Stop();
+        else
+            syncer.Start();
+
+        return true;
+    }, $"{(syncer == null ? "starting" : "stopping")} sync");
 
     #endregion
 

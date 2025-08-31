@@ -35,7 +35,7 @@
 
   <StackPanel>
     <Expander Padding="27,16"
-              Header="👆   manual"
+              Header="👆   manual control"
               IsExpanded="True">
       <Grid>
         <Grid.ColumnDefinitions>
@@ -108,12 +108,12 @@
                 Margin="0,0,16,0"
                 VerticalAlignment="Center"
                 IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
-                Maximum="{Binding Source={x:Static l:ViewModel.MaxColorTemperature}, Mode=OneTime}"
-                Minimum="{Binding Source={x:Static l:ViewModel.MinColorTemperature}, Mode=OneTime}"
+                Maximum="{Binding Source={x:Static l:ViewModel.MaxColorTemp}, Mode=OneTime}"
+                Minimum="{Binding Source={x:Static l:ViewModel.MinColorTemp}, Mode=OneTime}"
                 TickFrequency="100"
                 TickPlacement="Both"
                 ToolTip="adjust color temperature"
-                Value="{Binding ColorTemperature}" />
+                Value="{Binding ColorTemp}" />
 
         <md:PackIcon Grid.Row="2"
                      Grid.Column="3"
@@ -128,7 +128,7 @@
     <Border Style="{StaticResource HorizontalDividerBorder}" />
 
     <Expander Padding="27,16"
-              Header="🖥️   sync with screen"
+              Header="🖥️   screen sync"
               IsExpanded="True">
       <ToggleButton Width="48"
                     Height="48"

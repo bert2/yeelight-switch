@@ -26,8 +26,8 @@ public partial class MainWindow : MaterialWindow
         => viewModel.Brightness = ViewModel.MaxBrightness;
 
     private void SetMinTemperature(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        => viewModel.ColorTemperature = ViewModel.MinColorTemperature;
+        => viewModel.ColorTemp = ViewModel.MinColorTemp;
 
     private void SetMaxTemperature(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        => viewModel.ColorTemperature = ViewModel.MaxColorTemperature;
+        => viewModel.ColorTemp = ViewModel.MaxColorTemp;
 }
