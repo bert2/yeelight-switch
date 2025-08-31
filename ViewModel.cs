@@ -26,7 +26,7 @@ public class ViewModel : INotifyPropertyChanged
             DeviceLocator.MaxRetryCount = 3;
             var devices = await LogTask(DeviceLocator.DiscoverAsync(), $"searching for devices");
 
-            yeelight = devices.FirstOrDefault() ?? throw new InvalidOperationException("No device found.");
+            yeelight = devices.FirstOrDefault() ?? new Device("192.168.0.213"); // throw new InvalidOperationException("No device found.");
 
             //device.OnNotificationReceived += LogDeviceNotification;
             yeelight.OnError += LogDeviceError;

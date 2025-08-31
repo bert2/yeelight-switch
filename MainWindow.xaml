@@ -1,34 +1,31 @@
-﻿<mde:MaterialWindow
-  x:Class="Yeelight.Switch.MainWindow"
-  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-  xmlns:l="clr-namespace:Yeelight.Switch"
-  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-  xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-  xmlns:mde="https://spiegelp.github.io/MaterialDesignExtensions/winfx/xaml"
-  Title="yeelight switch"
-  Width="800"
-  Height="Auto"
-  d:DataContext="{d:DesignInstance Type=l:ViewModel,
-                                   IsDesignTimeCreatable=True}"
-  Background="{DynamicResource MaterialDesignPaper}"
-  BorderBackgroundBrush="{DynamicResource MaterialDesignToolBarBackground}"
-  FontFamily="{md:MaterialDesignFont}"
-  SizeToContent="Height"
-  TextElement.FontSize="14"
-  TextElement.FontWeight="Medium"
-  TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-  mc:Ignorable="d">
+﻿<mde:MaterialWindow x:Class="Yeelight.Switch.MainWindow"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                    xmlns:l="clr-namespace:Yeelight.Switch"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:mde="https://spiegelp.github.io/MaterialDesignExtensions/winfx/xaml"
+                    Title="yeelight switch"
+                    Width="800"
+                    Height="Auto"
+                    d:DataContext="{d:DesignInstance Type=l:ViewModel,
+                                                     IsDesignTimeCreatable=True}"
+                    Background="{DynamicResource MaterialDesignPaper}"
+                    BorderBackgroundBrush="{DynamicResource MaterialDesignToolBarBackground}"
+                    FontFamily="{md:MaterialDesignFont}"
+                    SizeToContent="Height"
+                    TextElement.FontSize="14"
+                    TextElement.FontWeight="Medium"
+                    TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+                    mc:Ignorable="d">
   <Window.Resources>
-    <l:QuadScaleConverter
-      x:Key="QuadScaleConv"
-      Max="{x:Static l:ViewModel.MaxBrightness}"
-      Min="{x:Static l:ViewModel.MinBrightness}" />
+    <l:QuadScaleConverter x:Key="QuadScaleConv"
+                          Max="{x:Static l:ViewModel.MaxBrightness}"
+                          Min="{x:Static l:ViewModel.MinBrightness}" />
 
-    <Style
-      x:Key="HorizontalDividerBorder"
-      TargetType="{x:Type Border}">
+    <Style x:Key="HorizontalDividerBorder"
+           TargetType="{x:Type Border}">
       <Setter Property="Background" Value="{DynamicResource MaterialDesignDivider}" />
       <Setter Property="UseLayoutRounding" Value="True" />
       <Setter Property="HorizontalAlignment" Value="Stretch" />
@@ -37,11 +34,9 @@
   </Window.Resources>
 
   <StackPanel>
-    <Expander
-      Padding="16"
-      HorizontalAlignment="Stretch"
-      Header="💡   brightness"
-      IsExpanded="True">
+    <Expander Padding="27,16"
+              Header="💡   brightness"
+              IsExpanded="True">
       <Grid>
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="Auto" />
@@ -50,56 +45,50 @@
           <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <ToggleButton
-          Grid.Column="0"
-          Width="48"
-          Height="48"
-          Margin="0,0,32,0"
-          VerticalAlignment="Center"
-          md:ToggleButtonAssist.OnContent="{md:PackIcon Kind=LightbulbOn}"
-          Content="{md:PackIcon Kind=LightbulbOffOutline}"
-          IsChecked="{Binding Power}"
-          IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
-          Style="{StaticResource MaterialDesignActionToggleButton}"
-          ToolTip="{Binding PowerButtonTooltip}" />
+        <ToggleButton Grid.Column="0"
+                      Width="48"
+                      Height="48"
+                      Margin="0,0,32,0"
+                      VerticalAlignment="Center"
+                      md:ToggleButtonAssist.OnContent="{md:PackIcon Kind=LightbulbOn}"
+                      Content="{md:PackIcon Kind=LightbulbOffOutline}"
+                      IsChecked="{Binding Power}"
+                      IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
+                      Style="{StaticResource MaterialDesignActionToggleButton}"
+                      ToolTip="{Binding PowerButtonTooltip}" />
 
-        <md:PackIcon
-          Grid.Column="1"
-          Width="32"
-          Height="32"
-          Margin="0,0,16,0"
-          VerticalAlignment="Center"
-          Kind="Brightness3" />
+        <md:PackIcon Grid.Column="1"
+                     Width="32"
+                     Height="32"
+                     Margin="0,0,16,0"
+                     VerticalAlignment="Center"
+                     Kind="Brightness3" />
 
-        <Slider
-          Grid.Column="2"
-          Margin="0,0,16,0"
-          VerticalAlignment="Center"
-          IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
-          IsSnapToTickEnabled="True"
-          Maximum="{Binding Source={x:Static l:ViewModel.MaxBrightness}, Mode=OneTime}"
-          Minimum="{Binding Source={x:Static l:ViewModel.MinBrightness}, Mode=OneTime}"
-          TickPlacement="Both"
-          Ticks="{Binding BrightnessTicks, Mode=OneTime}"
-          ToolTip="adjust brightness"
-          Value="{Binding Brightness, Converter={StaticResource QuadScaleConv}}" />
+        <Slider Grid.Column="2"
+                Margin="0,0,16,0"
+                VerticalAlignment="Center"
+                IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
+                IsSnapToTickEnabled="True"
+                Maximum="{Binding Source={x:Static l:ViewModel.MaxBrightness}, Mode=OneTime}"
+                Minimum="{Binding Source={x:Static l:ViewModel.MinBrightness}, Mode=OneTime}"
+                TickPlacement="Both"
+                Ticks="{Binding BrightnessTicks, Mode=OneTime}"
+                ToolTip="adjust brightness"
+                Value="{Binding Brightness, Converter={StaticResource QuadScaleConv}}" />
 
-        <md:PackIcon
-          Grid.Column="3"
-          Width="32"
-          Height="32"
-          VerticalAlignment="Center"
-          Kind="Brightness1" />
+        <md:PackIcon Grid.Column="3"
+                     Width="32"
+                     Height="32"
+                     VerticalAlignment="Center"
+                     Kind="Brightness1" />
       </Grid>
     </Expander>
 
     <Border Style="{StaticResource HorizontalDividerBorder}" />
 
-    <Expander
-      Padding="16"
-      HorizontalAlignment="Stretch"
-      Header="🌡   color temperature"
-      IsExpanded="True">
+    <Expander Padding="27,16"
+              Header="🌡   color temperature"
+              IsExpanded="True">
       <Grid>
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="Auto" />
@@ -107,54 +96,48 @@
           <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <md:PackIcon
-          Grid.Column="0"
-          Width="32"
-          Height="32"
-          Margin="0,0,16,0"
-          VerticalAlignment="Center"
-          Kind="WhiteBalanceSunny" />
+        <md:PackIcon Grid.Column="0"
+                     Width="32"
+                     Height="32"
+                     Margin="0,0,16,0"
+                     VerticalAlignment="Center"
+                     Kind="WhiteBalanceSunny" />
 
-        <Slider
-          Grid.Column="1"
-          Margin="0,0,16,0"
-          VerticalAlignment="Center"
-          IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
-          Maximum="{Binding Source={x:Static l:ViewModel.MaxColorTemperature}, Mode=OneTime}"
-          Minimum="{Binding Source={x:Static l:ViewModel.MinColorTemperature}, Mode=OneTime}"
-          TickFrequency="100"
-          TickPlacement="Both"
-          ToolTip="adjust color temperature"
-          Value="{Binding ColorTemperature}" />
+        <Slider Grid.Column="1"
+                Margin="0,0,16,0"
+                VerticalAlignment="Center"
+                IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
+                Maximum="{Binding Source={x:Static l:ViewModel.MaxColorTemperature}, Mode=OneTime}"
+                Minimum="{Binding Source={x:Static l:ViewModel.MinColorTemperature}, Mode=OneTime}"
+                TickFrequency="100"
+                TickPlacement="Both"
+                ToolTip="adjust color temperature"
+                Value="{Binding ColorTemperature}" />
 
-        <md:PackIcon
-          Grid.Column="2"
-          Width="32"
-          Height="32"
-          VerticalAlignment="Center"
-          Kind="Snowflake" />
+        <md:PackIcon Grid.Column="2"
+                     Width="32"
+                     Height="32"
+                     VerticalAlignment="Center"
+                     Kind="Snowflake" />
       </Grid>
     </Expander>
 
     <Border Style="{StaticResource HorizontalDividerBorder}" />
 
-    <Expander
-      Padding="16"
-      HorizontalAlignment="Stretch"
-      Header="📃   log">
-      <TextBox
-        Name="Log"
-        Grid.Row="2"
-        MaxHeight="300"
-        VerticalContentAlignment="Stretch"
-        BorderThickness="0"
-        Foreground="DarkGray"
-        HorizontalScrollBarVisibility="Auto"
-        IsReadOnly="True"
-        Text="{Binding Log, Mode=OneWay}"
-        TextChanged="Log_TextChanged"
-        TextWrapping="NoWrap"
-        VerticalScrollBarVisibility="Visible" />
+    <Expander Padding="27,16"
+              Header="📃   log">
+      <TextBox Name="Log"
+               Grid.Row="2"
+               MaxHeight="300"
+               VerticalContentAlignment="Stretch"
+               BorderThickness="0"
+               Foreground="DarkGray"
+               HorizontalScrollBarVisibility="Auto"
+               IsReadOnly="True"
+               Text="{Binding Log, Mode=OneWay}"
+               TextChanged="Log_TextChanged"
+               TextWrapping="NoWrap"
+               VerticalScrollBarVisibility="Visible" />
     </Expander>
   </StackPanel>
 </mde:MaterialWindow>
