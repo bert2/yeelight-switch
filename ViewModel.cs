@@ -118,9 +118,9 @@ public class ViewModel : INotifyPropertyChanged
         }
     }
 
-    public DoubleCollection BrightnessTicks { get; } = new DoubleCollection(Enumerable
+    public DoubleCollection BrightnessTicks { get; } = [.. Enumerable
         .Range(MinBrightness, MaxBrightness)
-        .Select(x => x.ToDouble().SqrtScale(MinBrightness, MaxBrightness)));
+        .Select(x => x.ToDouble().SqrtScale(MinBrightness, MaxBrightness))];
 
     public async Task SetBrightness(int brightness) => await Exec(
         d => d.SetBrightness(brightness),
@@ -148,6 +148,26 @@ public class ViewModel : INotifyPropertyChanged
     public async Task SetColorTemperature(int coltemp) => await Exec(
         d => d.SetColorTemperature(coltemp),
         $"setting color temperature to {coltemp}");
+
+    #endregion
+
+    #region sync
+
+    private bool syncRunning;
+    public bool SyncRunning
+    {
+        get => syncRunning;
+        set
+        {
+            _ = SetProp(ref syncRunning, value);
+            ToggleSync();
+            RaisePropertyChanged(nameof(SyncButtonTooltip));
+        }
+    }
+
+    public string SyncButtonTooltip => $"{(syncRunning ? "stop" : "start")} syncing";
+
+    public void ToggleSync() {}
 
     #endregion
 
