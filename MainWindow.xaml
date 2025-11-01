@@ -167,10 +167,11 @@
 
         <ComboBox Grid.Row="0"
                   Grid.Column="2"
-                  Width="200"
                   Margin="0,0,32,0"
                   VerticalAlignment="Center"
                   IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
+                  ItemsSource="{Binding Screens, Mode=OneTime}"
+                  SelectedItem="{Binding SelectedScreen}"
                   ToolTip="select screen" />
 
         <md:PackIcon Grid.Row="0"
@@ -188,11 +189,11 @@
                 IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
                 IsSnapToTickEnabled="True"
                 Maximum="300"
-                Minimum="100"
-                TickFrequency="10"
+                Minimum="0"
+                TickFrequency="30"
                 TickPlacement="Both"
                 ToolTip="adjust update smoothing"
-                Value="300" />
+                Value="{Binding Smooth}" />
       </Grid>
 
     </Expander>

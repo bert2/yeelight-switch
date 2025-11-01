@@ -65,6 +65,9 @@ public class ViewModel : INotifyPropertyChanged
 
     private bool commandExecuting;
 
+    public async Task Exec(Action task, FormattableString msg)
+        => await Exec(_ => { task(); return Task.FromResult(true); }, msg);
+
     public async Task Exec(Func<Device, Task<bool>> task, FormattableString msg)
     {
         if (yeelight is null || !Init.IsSuccessfullyCompleted || commandExecuting)
@@ -142,10 +145,10 @@ public class ViewModel : INotifyPropertyChanged
         .Range(MinBrightness, MaxBrightness)
         .Select(x => x.ToDouble().SqrtScale(MinBrightness, MaxBrightness))];
 
-    public async Task SetBrightness(int brightness)
+    private async Task SetBrightness(int brightness)
     {
         if (syncRunning)
-            await Exec(_ => { syncer!.Brightness = brightness; return Task.FromResult(true); }, $"setting sync brightness to {brightness}");
+            await Exec(() => syncer!.Brightness = brightness, $"setting sync brightness to {brightness}");
         else
             await Exec(d => d.SetBrightness(brightness), $"setting brightness to {brightness}");
     }
@@ -179,7 +182,7 @@ public class ViewModel : INotifyPropertyChanged
 
     #endregion
 
-    #region Sync
+    #region Sync toggle
 
     private bool syncRunning;
     public bool SyncRunning
@@ -206,6 +209,42 @@ public class ViewModel : INotifyPropertyChanged
 
         return true;
     }, $"{(syncer?.Running == true ? "stopping" : "starting")} sync");
+
+    #endregion
+
+    #region Screen
+
+    public string[] Screens { get; } = Syncer.ScreenNames;
+
+    private string selectedScreen = Syncer.PrimaryScreenName;
+    public string SelectedScreen
+    {
+        get => selectedScreen;
+        set
+        {
+            _ = SetProp(ref selectedScreen, value);
+            _ = SetScreen(value);
+        }
+    }
+
+    private async Task SetScreen(string screen) => await Exec(() => syncer!.Screen = screen, $"setting sync screen to {screen}");
+
+    #endregion
+
+    #region Smooth
+
+    private int smooth = 300;
+    public int Smooth
+    {
+        get => smooth;
+        set
+        {
+            _ = SetProp(ref smooth, value);
+            _ = SetSmooth(value);
+        }
+    }
+
+    private async Task SetSmooth(int smooth) => await Exec(() => syncer!.Smooth = smooth, $"setting sync smooth to {smooth}");
 
     #endregion
 

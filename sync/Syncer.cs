@@ -11,18 +11,35 @@ public class Syncer(Device device)
 
     private Task? syncLoop;
 
+    private Screenshot? screenshot;
+
     [MemberNotNullWhen(true, nameof(syncLoop), nameof(cts))]
     public bool Running { get; private set; }
 
-    public string Screen { get; set; } = "1";
+    private string screen = "2";
+    public string Screen {
+        get => screen;
+        set {
+            screen = value;
+            screenshot = Screenshot.FromScreenName(Screen);
+        }
+    }
 
     public int Brightness { get; set; } = 100;
 
-    public int Smooth { get; set; } = 300;
+    private int? smooth = 300;
+    public int Smooth {
+        get => smooth ?? 0;
+        set { smooth = value <= 0 ? null : value; }
+    }
 
     public int Fps { get; set; } = 30;
 
     public int SampleStep { get; set; } = 2;
+
+    public static string[] ScreenNames { get; } = [.. System.Windows.Forms.Screen.AllScreens.Select(s => s.DeviceName.TrimStart('\\', '.'))];
+
+    public static string PrimaryScreenName { get; } = System.Windows.Forms.Screen.PrimaryScreen!.DeviceName.TrimStart('\\', '.');
 
     public void Start()
     {
@@ -42,7 +59,7 @@ public class Syncer(Device device)
 
     private async Task Loop(CancellationToken ct)
     {
-        var screenshot = Screenshot.FromScreenName(Screen);
+        screenshot = Screenshot.FromScreenName(Screen);
         Color? prevColor = null;
         var prevBright = 0;
         var delay = 1000 / Fps;
