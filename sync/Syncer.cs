@@ -14,7 +14,7 @@ public class Syncer(Device device)
     [MemberNotNullWhen(true, nameof(syncLoop), nameof(cts))]
     public bool Running { get; private set; }
 
-    public string Screen { get; set; } = "2";
+    public string Screen { get; set; } = "1";
 
     public int Brightness { get; set; } = 100;
 

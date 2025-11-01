@@ -14,7 +14,7 @@ using YeelightAPI.Models;
 
 public class ViewModel : INotifyPropertyChanged
 {
-    #region Initialization
+    #region Init
 
     private Device? yeelight;
 
@@ -22,9 +22,9 @@ public class ViewModel : INotifyPropertyChanged
 
     public NotifyTask Init { get; set; }
 
-    public ViewModel() => Init = NotifyTask.Create(() => InitDevice());
+    public ViewModel() => Init = NotifyTask.Create(InitDevice);
 
-    public async Task InitDevice()
+    private async Task InitDevice()
     {
         try
         {
@@ -47,7 +47,7 @@ public class ViewModel : INotifyPropertyChanged
             var coltemp = await LogTask(yeelight.GetProp(PROPERTIES.ct), $"reading color temperature");
             ColorTemp = int.Parse((string)coltemp);
 
-            await LogTask(yeelight.StartMusicMode(), $"starting music mode");
+            if (Power) await LogTask(yeelight.StartMusicMode(), $"starting music mode");
 
             syncer = new Syncer(yeelight);
         }
@@ -104,9 +104,20 @@ public class ViewModel : INotifyPropertyChanged
 
     public string PowerButtonTooltip => $"turn {(Power ? "off" : "on")}";
 
-    public async Task SetPower(bool power) => await Exec(
-        d => power ? d.TurnOn() : d.TurnOff(),
-        $"turning device {(power ? "on" : "off")}");
+    public async Task SetPower(bool power)
+    {
+
+        if (power)
+        {
+            await Exec(d => d.TurnOn(), $"turning device on");
+            await Exec(d => d.StartMusicMode(), $"starting music mode");
+        } else
+        {
+            await Exec(d => d.StopMusicMode(), $"stopping music mode");
+            await Exec(d => d.TurnOff(), $"turning device off");
+        }
+            
+    }
 
     #endregion
 
@@ -131,9 +142,13 @@ public class ViewModel : INotifyPropertyChanged
         .Range(MinBrightness, MaxBrightness)
         .Select(x => x.ToDouble().SqrtScale(MinBrightness, MaxBrightness))];
 
-    public async Task SetBrightness(int brightness) => await Exec(
-        d => d.SetBrightness(brightness),
-        $"setting brightness to {brightness}");
+    public async Task SetBrightness(int brightness)
+    {
+        if (syncRunning)
+            await Exec(_ => { syncer!.Brightness = brightness; return Task.FromResult(true); }, $"setting sync brightness to {brightness}");
+        else
+            await Exec(d => d.SetBrightness(brightness), $"setting brightness to {brightness}");
+    }
 
     #endregion
 
@@ -190,7 +205,7 @@ public class ViewModel : INotifyPropertyChanged
             syncer.Start();
 
         return true;
-    }, $"{(syncer == null ? "starting" : "stopping")} sync");
+    }, $"{(syncer?.Running == true ? "stopping" : "starting")} sync");
 
     #endregion
 

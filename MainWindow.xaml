@@ -130,14 +130,71 @@
     <Expander Padding="27,16"
               Header="🖥️   screen sync"
               IsExpanded="True">
-      <ToggleButton Width="48"
-                    Height="48"
-                    md:ToggleButtonAssist.OnContent="{md:PackIcon Kind=Stop}"
-                    Content="{md:PackIcon Kind=Play}"
-                    IsChecked="{Binding SyncRunning}"
-                    IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
-                    Style="{StaticResource MaterialDesignActionToggleButton}"
-                    ToolTip="{Binding SyncButtonTooltip}" />
+
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ToggleButton Grid.Row="0"
+                      Grid.Column="0"
+                      Width="48"
+                      Height="48"
+                      Margin="0,0,32,0"
+                      VerticalAlignment="Center"
+                      md:ToggleButtonAssist.OnContent="{md:PackIcon Kind=Stop}"
+                      Content="{md:PackIcon Kind=Play}"
+                      IsChecked="{Binding SyncRunning}"
+                      IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
+                      Style="{StaticResource MaterialDesignActionToggleButton}"
+                      ToolTip="{Binding SyncButtonTooltip}" />
+
+        <md:PackIcon Grid.Row="0"
+                     Grid.Column="1"
+                     Width="32"
+                     Height="32"
+                     Margin="0,0,16,0"
+                     VerticalAlignment="Center"
+                     Kind="Monitor" />
+
+        <ComboBox Grid.Row="0"
+                  Grid.Column="2"
+                  Width="200"
+                  Margin="0,0,32,0"
+                  VerticalAlignment="Center"
+                  IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
+                  ToolTip="select screen" />
+
+        <md:PackIcon Grid.Row="0"
+                     Grid.Column="3"
+                     Width="32"
+                     Height="32"
+                     Margin="0,0,16,0"
+                     VerticalAlignment="Center"
+                     Kind="Update" />
+
+        <Slider Grid.Row="0"
+                Grid.Column="4"
+                Margin="0,0,48,0"
+                VerticalAlignment="Center"
+                IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
+                IsSnapToTickEnabled="True"
+                Maximum="300"
+                Minimum="100"
+                TickFrequency="10"
+                TickPlacement="Both"
+                ToolTip="adjust update smoothing"
+                Value="300" />
+      </Grid>
+
     </Expander>
 
     <Border Style="{StaticResource HorizontalDividerBorder}" />
