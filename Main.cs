@@ -46,8 +46,7 @@ public class Main : ViewModel {
             if (Power) _ = await Log.Task(yeelight.StartMusicMode(), $"starting music mode");
 
             syncer = new Syncer(yeelight, Log.Info);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             Log.Newline();
             Log.Error($"failed to initialize: {ex.Message}");
             throw;
@@ -73,12 +72,10 @@ public class Main : ViewModel {
         try {
             commandExecuting = true;
             _ = await Log.Task(task(yeelight), msg);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             Log.Newline();
             Log.Error($"failure when {msg}: {ex.Message}");
-        }
-        finally {
+        } finally {
             commandExecuting = false;
         }
     }
@@ -103,8 +100,7 @@ public class Main : ViewModel {
         if (power) {
             await Exec(d => d.TurnOn(), $"turning device on");
             await Exec(d => d.StartMusicMode(), $"starting music mode");
-        }
-        else {
+        } else {
             await Exec(d => d.StopMusicMode(), $"stopping music mode");
             await Exec(d => d.TurnOff(), $"turning device off");
         }
