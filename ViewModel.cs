@@ -14,11 +14,13 @@ using YeelightAPI.Models;
 
 public class ViewModel : INotifyPropertyChanged
 {
-    #region Init
-
     private Device? yeelight;
 
     private Syncer? syncer;
+
+    public Log Log { get; } = new Log();
+
+    #region Init
 
     public NotifyTask Init { get; set; }
 
@@ -29,32 +31,32 @@ public class ViewModel : INotifyPropertyChanged
         try
         {
             DeviceLocator.MaxRetryCount = 3;
-            var devices = await LogTask(DeviceLocator.DiscoverAsync(), $"searching for devices");
+            var devices = await Log.Task(DeviceLocator.DiscoverAsync(), $"searching for devices");
 
             yeelight = devices.FirstOrDefault() ?? new Device("192.168.0.213"); // throw new InvalidOperationException("No device found.");
 
             //device.OnNotificationReceived += LogDeviceNotification;
-            yeelight.OnError += LogDeviceError;
+            yeelight.OnError += Log.DeviceError;
 
-            _ = await LogTask(yeelight.Connect(), $"connecting to {yeelight}");
+            _ = await Log.Task(yeelight.Connect(), $"connecting to {yeelight}");
 
-            var power = await LogTask(yeelight.GetProp(PROPERTIES.power), $"reading power");
+            var power = await Log.Task(yeelight.GetProp(PROPERTIES.power), $"reading power");
             Power = power.Equals("on");
 
-            var brightness = await LogTask(yeelight.GetProp(PROPERTIES.bright), $"reading brightness");
+            var brightness = await Log.Task(yeelight.GetProp(PROPERTIES.bright), $"reading brightness");
             Brightness = int.Parse((string)brightness);
 
-            var coltemp = await LogTask(yeelight.GetProp(PROPERTIES.ct), $"reading color temperature");
+            var coltemp = await Log.Task(yeelight.GetProp(PROPERTIES.ct), $"reading color temperature");
             ColorTemp = int.Parse((string)coltemp);
 
-            if (Power) await LogTask(yeelight.StartMusicMode(), $"starting music mode");
+            if (Power) await Log.Task(yeelight.StartMusicMode(), $"starting music mode");
 
-            syncer = new Syncer(yeelight);
+            syncer = new Syncer(yeelight, Log.Info);
         }
         catch (Exception ex)
         {
-            LogNewline();
-            LogError($"failed to initialize: {ex.Message}");
+            Log.Newline();
+            Log.Error($"failed to initialize: {ex.Message}");
             throw;
         }
     }
@@ -68,6 +70,9 @@ public class ViewModel : INotifyPropertyChanged
     public async Task Exec(Action task, FormattableString msg)
         => await Exec(_ => { task(); return Task.FromResult(true); }, msg);
 
+    public async Task Exec(Func<Task> task, FormattableString msg)
+        => await Exec(async _ => { await task(); return true; }, msg);
+
     public async Task Exec(Func<Device, Task<bool>> task, FormattableString msg)
     {
         if (yeelight is null || !Init.IsSuccessfullyCompleted || commandExecuting)
@@ -76,12 +81,12 @@ public class ViewModel : INotifyPropertyChanged
         try
         {
             commandExecuting = true;
-            _ = await LogTask(task(yeelight), msg);
+            _ = await Log.Task(task(yeelight), msg);
         }
         catch (Exception ex)
         {
-            LogNewline();
-            LogError($"failure when {msg}: {ex.Message}");
+            Log.Newline();
+            Log.Error($"failure when {msg}: {ex.Message}");
         }
         finally
         {
@@ -107,9 +112,8 @@ public class ViewModel : INotifyPropertyChanged
 
     public string PowerButtonTooltip => $"turn {(Power ? "off" : "on")}";
 
-    public async Task SetPower(bool power)
+    private async Task SetPower(bool power)
     {
-
         if (power)
         {
             await Exec(d => d.TurnOn(), $"turning device on");
@@ -119,7 +123,6 @@ public class ViewModel : INotifyPropertyChanged
             await Exec(d => d.StopMusicMode(), $"stopping music mode");
             await Exec(d => d.TurnOff(), $"turning device off");
         }
-            
     }
 
     #endregion
@@ -198,17 +201,13 @@ public class ViewModel : INotifyPropertyChanged
 
     public string SyncButtonTooltip => $"{(syncRunning ? "stop" : "start")} syncing";
 
-    public async Task ToggleSync() => await Exec(async d =>
+    public async Task ToggleSync() => await Exec(async () =>
     {
-        if (syncer == null) return false;
-
-        if (syncer.Running)
+        if (syncer!.Running)
             await syncer.Stop();
         else
             syncer.Start();
-
-        return true;
-    }, $"{(syncer?.Running == true ? "stopping" : "starting")} sync");
+    }, $"{(syncer!.Running ? "stopping" : "starting")} sync");
 
     #endregion
 
@@ -245,39 +244,6 @@ public class ViewModel : INotifyPropertyChanged
     }
 
     private async Task SetSmooth(int smooth) => await Exec(() => syncer!.Smooth = smooth, $"setting sync smooth to {smooth}");
-
-    #endregion
-
-    #region Log
-
-    private string log = "";
-    public string Log { get => log; set => SetProp(ref log, value); }
-
-    public void LogInfo(FormattableString msg) => Log += $"{msg}\n";
-
-    public void LogError(FormattableString msg) => Log += $"ERROR: {msg}\n";
-
-    public async Task<T> LogTask<T>(Task<T> task, FormattableString msg)
-    {
-        Log += $"{msg} ... ";
-        var result = await task;
-        Log += PrintResult(result);
-        Log += '\n';
-        return result;
-    }
-
-    public void LogDeviceNotification(object _, NotificationReceivedEventArgs e) => LogInfo($"notification received: {e.Result}");
-
-    public void LogDeviceError(object _, UnhandledExceptionEventArgs e) => LogError($"{e.ExceptionObject}");
-
-    public void LogNewline() => Log += '\n';
-
-    private static string PrintResult<T>(T x) => x switch
-    {
-        bool b => b ? "done" : "FAILED",
-        IEnumerable<Device> e => e.Count().ToString(),
-        _ => x?.ToString() ?? ""
-    };
 
     #endregion
 

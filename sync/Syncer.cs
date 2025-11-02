@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using YeelightAPI;
 
-public class Syncer(Device device)
+public class Syncer(Device device, Action<FormattableString> log)
 {
     private CancellationTokenSource? cts;
 
@@ -76,7 +76,10 @@ public class Syncer(Device device)
                 color = Color.Black;
 
             if (color != prevColor)
+            {
+                log($"setting color to {color}");
                 await device.SetRGBColor(color.R, color.G, color.B, Smooth);
+            }
 
             if (bright != prevBright)
                 await device.SetBrightness(bright, Smooth);
@@ -86,5 +89,7 @@ public class Syncer(Device device)
 
             await Task.Delay(delay, CancellationToken.None);
         }
+
+        log($"Sync loop ended");
     }
 }

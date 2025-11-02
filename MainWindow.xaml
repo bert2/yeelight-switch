@@ -210,7 +210,7 @@
                Foreground="DarkGray"
                HorizontalScrollBarVisibility="Auto"
                IsReadOnly="True"
-               Text="{Binding Log, Mode=OneWay}"
+               Text="{Binding Log.Text, Mode=OneWay}"
                TextChanged="Log_TextChanged"
                TextWrapping="NoWrap"
                VerticalScrollBarVisibility="Visible" />
