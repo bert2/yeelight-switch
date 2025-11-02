@@ -9,7 +9,7 @@
                     Title="yeelight switch"
                     Width="800"
                     Height="Auto"
-                    d:DataContext="{d:DesignInstance Type=l:ViewModel,
+                    d:DataContext="{d:DesignInstance Type=l:Main,
                                                      IsDesignTimeCreatable=True}"
                     Background="{DynamicResource MaterialDesignPaper}"
                     BorderBackgroundBrush="{DynamicResource MaterialDesignToolBarBackground}"
@@ -21,8 +21,8 @@
                     mc:Ignorable="d">
   <Window.Resources>
     <l:QuadScaleConverter x:Key="QuadScaleConv"
-                          Max="{x:Static l:ViewModel.MaxBrightness}"
-                          Min="{x:Static l:ViewModel.MinBrightness}" />
+                          Max="{x:Static l:Main.MaxBrightness}"
+                          Min="{x:Static l:Main.MinBrightness}" />
 
     <Style x:Key="HorizontalDividerBorder"
            TargetType="{x:Type Border}">
@@ -79,8 +79,8 @@
                 VerticalAlignment="Center"
                 IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
                 IsSnapToTickEnabled="True"
-                Maximum="{Binding Source={x:Static l:ViewModel.MaxBrightness}, Mode=OneTime}"
-                Minimum="{Binding Source={x:Static l:ViewModel.MinBrightness}, Mode=OneTime}"
+                Maximum="{Binding Source={x:Static l:Main.MaxBrightness}, Mode=OneTime}"
+                Minimum="{Binding Source={x:Static l:Main.MinBrightness}, Mode=OneTime}"
                 TickPlacement="Both"
                 Ticks="{Binding BrightnessTicks, Mode=OneTime}"
                 ToolTip="adjust brightness"
@@ -108,8 +108,8 @@
                 Margin="0,0,16,0"
                 VerticalAlignment="Center"
                 IsEnabled="{Binding Init.IsSuccessfullyCompleted}"
-                Maximum="{Binding Source={x:Static l:ViewModel.MaxColorTemp}, Mode=OneTime}"
-                Minimum="{Binding Source={x:Static l:ViewModel.MinColorTemp}, Mode=OneTime}"
+                Maximum="{Binding Source={x:Static l:Main.MaxColorTemp}, Mode=OneTime}"
+                Minimum="{Binding Source={x:Static l:Main.MinColorTemp}, Mode=OneTime}"
                 TickFrequency="100"
                 TickPlacement="Both"
                 ToolTip="adjust color temperature"

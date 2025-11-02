@@ -7,12 +7,12 @@ using MaterialDesignExtensions.Controls;
 
 public partial class MainWindow : MaterialWindow
 {
-    private readonly ViewModel viewModel;
+    private readonly Main viewModel;
 
     public MainWindow()
     {
         InitializeComponent();
-        viewModel = new ViewModel();
+        viewModel = new Main();
         DataContext = viewModel;
     }
 
@@ -20,14 +20,14 @@ public partial class MainWindow : MaterialWindow
         => ((TextBoxBase)sender).ScrollToEnd();
 
     private void SetMinBrightness(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        => viewModel.Brightness = ViewModel.MinBrightness;
+        => viewModel.Brightness = Main.MinBrightness;
 
     private void SetMaxBrightness(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        => viewModel.Brightness = ViewModel.MaxBrightness;
+        => viewModel.Brightness = Main.MaxBrightness;
 
     private void SetMinTemperature(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        => viewModel.ColorTemp = ViewModel.MinColorTemp;
+        => viewModel.ColorTemp = Main.MinColorTemp;
 
     private void SetMaxTemperature(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        => viewModel.ColorTemp = ViewModel.MaxColorTemp;
+        => viewModel.ColorTemp = Main.MaxColorTemp;
 }

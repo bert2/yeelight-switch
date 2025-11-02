@@ -6,8 +6,7 @@ using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-public class Screenshot
-{
+public class Screenshot {
     public readonly string ScreenName;
     public readonly Rectangle Bounds;
     public readonly Screen? Screen;
@@ -29,8 +28,7 @@ public class Screenshot
         width: GetSystemMetrics(SystemMetric.SM_CXVIRTUALSCREEN),
         height: GetSystemMetrics(SystemMetric.SM_CYVIRTUALSCREEN));
 
-    public static Screenshot FromScreenName(string name)
-    {
+    public static Screenshot FromScreenName(string name) {
         if (name.EqualsI("primary"))
             return FromPrimaryScreen();
         else if (name.EqualsI("virtual"))
@@ -40,16 +38,14 @@ public class Screenshot
             .Where(s => s.DeviceName.ContainsI(name))
             .ToArray();
 
-        return screens switch
-        {
+        return screens switch {
             [var s] => new(s),
             [] => throw new InvalidOperationException($"No screen matching '{name}' found. Available screens: {Screen.AllScreens.Print()}"),
             _ => throw new InvalidOperationException($"Multiple screens found for '{name}': {screens.Print()}")
         };
     }
 
-    public static IEnumerable<Screenshot> All(string? filter)
-    {
+    public static IEnumerable<Screenshot> All(string? filter) {
         if (filter.EqualsI("primary"))
             return FromPrimaryScreen().AsSingleton();
         else if (filter.EqualsI("virtual"))
@@ -72,8 +68,7 @@ public class Screenshot
     public Screenshot(string screenName, int top, int left, int width, int height)
         : this(screenName, new Rectangle(x: left, y: top, width, height)) { }
 
-    public Screenshot(string screenName, Rectangle bounds, Screen? screen = null)
-    {
+    public Screenshot(string screenName, Rectangle bounds, Screen? screen = null) {
         ScreenName = screenName + (screen?.Primary == true ? " (primary)" : "");
         Bounds = bounds;
         Screen = screen;
@@ -85,8 +80,7 @@ public class Screenshot
 
     public void Refresh() => Gfx.CopyFromScreen(Bounds.Location, new Point(0, 0), Bounds.Size);
 
-    public unsafe Color GetAverageColor(int sampleStep)
-    {
+    public unsafe Color GetAverageColor(int sampleStep) {
         var data = Image.LockBits(
             new Rectangle(Point.Empty, Image.Size),
             ImageLockMode.ReadOnly,
@@ -96,10 +90,8 @@ public class Screenshot
         var (sumR, sumG, sumB) = (0L, 0L, 0L);
         var stride = data.Stride / sizeof(int) * sampleStep;
 
-        for (var y = 0; y < data.Height; y += sampleStep)
-        {
-            for (var x = 0; x < data.Width; x += sampleStep)
-            {
+        for (var y = 0; y < data.Height; y += sampleStep) {
+            for (var x = 0; x < data.Width; x += sampleStep) {
                 var argb = row[x];
                 sumR += (argb & 0x00FF0000) >> 16;
                 sumG += (argb & 0x0000FF00) >> 8;
@@ -121,8 +113,7 @@ public class Screenshot
     [DllImport("user32.dll")]
     private static extern int GetSystemMetrics(SystemMetric metric);
 
-    private enum SystemMetric
-    {
+    private enum SystemMetric {
         SM_XVIRTUALSCREEN = 76,
         SM_YVIRTUALSCREEN = 77,
         SM_CXVIRTUALSCREEN = 78,

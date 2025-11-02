@@ -1,9 +1,7 @@
 ﻿namespace Yeelight.Switch;
 
-public static class Util
-{
-    public static IEnumerable<T> AsSingleton<T>(this T x)
-    {
+public static class Util {
+    public static IEnumerable<T> AsSingleton<T>(this T x) {
         yield return x;
     }
 

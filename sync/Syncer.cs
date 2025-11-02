@@ -5,8 +5,7 @@ using System.Threading.Tasks;
 
 using YeelightAPI;
 
-public class Syncer(Device device, Action<FormattableString> log)
-{
+public class Syncer(Device device, Action<FormattableString> log) {
     private CancellationTokenSource? cts;
 
     private Task? syncLoop;
@@ -30,7 +29,7 @@ public class Syncer(Device device, Action<FormattableString> log)
     private int? smooth = 300;
     public int Smooth {
         get => smooth ?? 0;
-        set { smooth = value <= 0 ? null : value; }
+        set => smooth = value <= 0 ? null : value;
     }
 
     public int Fps { get; set; } = 30;
@@ -41,15 +40,13 @@ public class Syncer(Device device, Action<FormattableString> log)
 
     public static string PrimaryScreenName { get; } = System.Windows.Forms.Screen.PrimaryScreen!.DeviceName.TrimStart('\\', '.');
 
-    public void Start()
-    {
+    public void Start() {
         cts = new();
         syncLoop = Loop(cts.Token);
         Running = true;
     }
 
-    public async Task Stop()
-    {
+    public async Task Stop() {
         if (!Running) return;
         await cts.CancelAsync();
         await syncLoop;
@@ -57,15 +54,13 @@ public class Syncer(Device device, Action<FormattableString> log)
         Running = false;
     }
 
-    private async Task Loop(CancellationToken ct)
-    {
+    private async Task Loop(CancellationToken ct) {
         screenshot = Screenshot.FromScreenName(Screen);
         Color? prevColor = null;
         var prevBright = 0;
         var delay = 1000 / Fps;
 
-        while (!ct.IsCancellationRequested)
-        {
+        while (!ct.IsCancellationRequested) {
             screenshot.Refresh();
 
             var color = screenshot.GetAverageColor(SampleStep);
@@ -76,13 +71,10 @@ public class Syncer(Device device, Action<FormattableString> log)
                 color = Color.Black;
 
             if (color != prevColor)
-            {
-                log($"setting color to {color}");
-                await device.SetRGBColor(color.R, color.G, color.B, Smooth);
-            }
+                _ = await device.SetRGBColor(color.R, color.G, color.B, Smooth);
 
             if (bright != prevBright)
-                await device.SetBrightness(bright, Smooth);
+                _ = await device.SetBrightness(bright, Smooth);
 
             prevColor = color;
             prevBright = bright;
