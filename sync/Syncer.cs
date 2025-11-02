@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using YeelightAPI;
 
-public class Syncer(Device device, Action<FormattableString> log) {
+public class Syncer(Device device) {
     private CancellationTokenSource? cts;
 
     private Task? syncLoop;
@@ -15,7 +15,7 @@ public class Syncer(Device device, Action<FormattableString> log) {
     [MemberNotNullWhen(true, nameof(syncLoop), nameof(cts))]
     public bool Running { get; private set; }
 
-    private string screen = "2";
+    private string screen = PrimaryScreenName;
     public string Screen {
         get => screen;
         set {
@@ -26,7 +26,7 @@ public class Syncer(Device device, Action<FormattableString> log) {
 
     public int Brightness { get; set; } = 100;
 
-    private int? smooth = 300;
+    private int? smooth;
     public int Smooth {
         get => smooth ?? 0;
         set => smooth = value <= 0 ? null : value;
@@ -81,7 +81,5 @@ public class Syncer(Device device, Action<FormattableString> log) {
 
             await Task.Delay(delay, CancellationToken.None);
         }
-
-        log($"Sync loop ended");
     }
 }

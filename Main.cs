@@ -45,7 +45,7 @@ public class Main : ViewModel {
 
             if (Power) _ = await Log.Task(yeelight.StartMusicMode(), $"starting music mode");
 
-            syncer = new Syncer(yeelight, Log.Info);
+            syncer = new(yeelight);
         } catch (Exception ex) {
             Log.Newline();
             Log.Error($"failed to initialize: {ex.Message}");
@@ -201,7 +201,7 @@ public class Main : ViewModel {
 
     #region Smooth
 
-    private int smooth = 300;
+    private int smooth;
     public int Smooth {
         get => smooth;
         set {
